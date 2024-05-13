@@ -1,4 +1,4 @@
-package com.bentoco.idempotencywithjava;
+package com.bentoco.idempotencywithjava.etag;
 
 import org.springframework.stereotype.Repository;
 

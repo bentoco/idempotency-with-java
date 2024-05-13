@@ -1,4 +1,4 @@
-package com.bentoco.idempotencywithjava;
+package com.bentoco.idempotencywithjava.etag;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,12 +28,12 @@ public class ETagHeaderApproachTest {
     }
 
     @Test
-    void updateCustomers_ExistingCustomer_MatchesETag_ReturnsConflict() {
+    void updateCustomers_ExistingCustomer_DoesNotMatchETag_ReturnsConflict() {
         // Arrange
         long customerId = 1L;
         String existingETag = UUID.randomUUID().toString();
         CustomerInput customerInput = new CustomerInput("John", (short) 30);
-        when(customerRepository.findById(customerId)).thenReturn(Optional.of(new Customer(customerId, "John", (short) 30, existingETag)));
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(new Customer(customerId, "John", (short) 30, UUID.randomUUID().toString())));
 
         // Act
         ResponseEntity<CustomerOutput> response = controller.updateCustomers(customerId, existingETag, customerInput);
@@ -43,7 +43,7 @@ public class ETagHeaderApproachTest {
     }
 
     @Test
-    void updateCustomers_ExistingCustomer_DoesNotMatchETag_ReturnsOk() {
+    void updateCustomers_ExistingCustomer_MatchesETag_ReturnsOk() {
         // Arrange
         long customerId = 1L;
         String existingETag = UUID.randomUUID().toString();
@@ -51,7 +51,7 @@ public class ETagHeaderApproachTest {
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(new Customer(customerId, "John", (short) 30, existingETag)));
 
         // Act
-        ResponseEntity<CustomerOutput> response = controller.updateCustomers(customerId, UUID.randomUUID().toString(), customerInput);
+        ResponseEntity<CustomerOutput> response = controller.updateCustomers(customerId, existingETag, customerInput);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());

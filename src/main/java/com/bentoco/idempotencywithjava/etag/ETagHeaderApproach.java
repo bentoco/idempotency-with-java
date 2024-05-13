@@ -1,4 +1,4 @@
-package com.bentoco.idempotencywithjava;
+package com.bentoco.idempotencywithjava.etag;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,18 +30,24 @@ public class ETagHeaderApproach {
             @RequestHeader("If-Match") String matcherHeader,
             @RequestBody CustomerInput customerInput
     ) {
+        // getting the existing customer and its ETag
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
         if (optionalCustomer.isPresent()) {
             Customer existingCustomer = optionalCustomer.get();
             String eTag = existingCustomer.eTag();
-            if (eTag.equals(matcherHeader)) {
+
+            // checking for a match
+            if (!eTag.equals(matcherHeader)) {
                 return ResponseEntity.status(CONFLICT).build();
-            } else {
-                String newETag = UUID.randomUUID().toString();
-                Customer updatedCustomer = new Customer(id, customerInput.name(), customerInput.age(), newETag);
-                customerRepository.save(updatedCustomer);
-                return ResponseEntity.ok(new CustomerOutput(newETag));
             }
+
+            //updating the customer content and generating a new ETag
+            String newETag = UUID.randomUUID().toString();
+            Customer updatedCustomer = new Customer(id, customerInput.name(), customerInput.age(), newETag);
+            customerRepository.save(updatedCustomer);
+
+            // returning the success response with the new ETag:
+            return ResponseEntity.ok(new CustomerOutput(newETag));
         }
         return ResponseEntity.status(NOT_FOUND).build();
     }
