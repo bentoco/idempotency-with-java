@@ -32,7 +32,7 @@ public class PaymentServerController {
      * @param idempotentId The idempotent ID for the request.
      * @return ResponseEntity with HTTP status and payment ID.
      */
-    @PostMapping
+    @PostMapping("/payments")
     public ResponseEntity<String> sendPayment(
             @RequestBody Payment input,
             @RequestHeader("x-idempotent-id") String idempotentId
