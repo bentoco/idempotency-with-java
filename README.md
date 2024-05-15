@@ -76,6 +76,7 @@ This class represents a repository for managing customer records.
 
 # References
 
+- https://martinfowler.com/articles/patterns-of-distributed-systems/idempotent-receiver.html
 - https://www.freecodecamp.org/news/idempotency-in-http-methods/
 - https://www.baeldung.com/cs/idempotent-operations
 - https://www.javacodegeeks.com/2021/06/making-post-and-patch-requests-idempotent.html
